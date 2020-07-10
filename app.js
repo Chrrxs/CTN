@@ -85,7 +85,6 @@ function loopFunction() {
         if (!error && response.statusCode === 200) {
             tradeID = body["data"][0].id
             tradePartner = body["data"][0].user.name
-
             if (tradeID != currentID) {
 
                 var tradeInfoOptions = {
@@ -95,17 +94,17 @@ function loopFunction() {
                     json: true
                 }
 
-
                 request(tradeInfoOptions, function (error, response, body) {
                     if (!error && response.statusCode === 200) {
                         var playerAssetsArray = {}
                         var partnerAssetsArray = {}
                         var tradePartnerID = body["user"]["id"]
-                        var userOffer = body.offers[1].userAssets
-                        var partnerOffer = body.offers[0].userAssets
+                        var userOffer = body.offers[0].userAssets
+                        var partnerOffer = body.offers[1].userAssets
                         userOffer.forEach(function (item) {
                             var AssetID = item["assetId"]
                             var UAID = item["id"]
+
                             if (playerAssetsArray[AssetID] !== undefined) {
                                 playerAssetsArray[AssetID].push(UAID)
                             } else {
@@ -116,11 +115,11 @@ function loopFunction() {
                         partnerOffer.forEach(function (item) {
                             var AssetID = item["assetId"]
                             var UAID = item["id"]
+
                             if (partnerAssetsArray[AssetID] !== undefined) {
                                 partnerAssetsArray[AssetID].push(UAID)
                             } else {
                                 partnerAssetsArray[AssetID] = [UAID]
-
                             }
                         });
 
@@ -152,30 +151,32 @@ function loopFunction() {
                                         num_limiteds: e
                                     }
                                 }
-                                function getNonValued(l) {
+
+                                function getNonValued(arg) {
                                     var total = 0
-                                    for (var s in l) {
+                                    for (var s in arg) {
                                         if (item_list[s][3] == -1) {
                                             total = total + parseInt(item_list[s][2]) + 1
                                         }
                                     }
-                                    return {
-                                        extra: total
-                                    }
+                                    return total
                                 }
 
                                 var playerTradeData = calc(playerAssetsArray)
                                 var partnerTradeData = calc(partnerAssetsArray)
-                                var additionalRapPlayer = getNonValued(playerAssetsArray)
-                                var additionalRapPartner = getNonValued(partnerAssetsArray)
+                                var givenValue = playerTradeData.value + getNonValued(playerAssetsArray)
+                                var recievedValue = partnerTradeData.value + getNonValued(partnerAssetsArray)
 
-                                var recievedValue = partnerTradeData.value + additionalRapPartner.extra
+                                if (givenValue <= 0) {
+                                    givenValue = 0
+                                }
 
-                                var givenValue = playerTradeData.value + additionalRapPlayer.extra
+                                if (recievedValue <= 0) {
+                                    recievedValue = 0
+                                }
 
                                 var givenRAP = playerTradeData.rap
                                 var recievedRAP = partnerTradeData.rap
-
                                 const embed = {
                                     "title": "Trade Completed",
                                     "description": "A New trade has been completed!",
@@ -189,7 +190,7 @@ function loopFunction() {
                                         "url": "https://web.roblox.com/Thumbs/Avatar.ashx?x=100&y=100&Format=Png&userid=" + tradePartnerID
                                     },
                                     "author": {
-                                        "name": "CTN (Open Source)",
+                                        "name": "CTN",
                                         "icon_url": "https://media.giphy.com/media/cL4VwGyAEP76FQV4vs/giphy.gif"
                                     },
                                     "fields": [
