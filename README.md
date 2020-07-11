@@ -12,6 +12,8 @@ Node.js (https://nodejs.org/en/download/)
 3. Edit the settings file with your webhook and mention
 4. Type `node app.js` in command prompt to run CTN
 
-#How to setup (Linux) 
->Huge thanks to val#1337
+# How to setup (Linux) 
+
+> This tutorial was made by val#1337
+
 Link: https://github.com/valphn/CTN-OTB
