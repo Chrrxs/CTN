@@ -21,10 +21,17 @@ var getFromBetween = {
         this.string = this.string.replace(removal, "");
     },
     getAllResults: function (sub1, sub2) {
+        // first check to see if we do have both substrings
         if (this.string.indexOf(sub1) < 0 || this.string.indexOf(sub2) < 0) return;
+
+        // find one result
         var result = this.getFromBetween(sub1, sub2);
+        // push it to the results array
         this.results.push(result);
+        // remove the most recently found one from the string
         this.removeFromBetween(sub1, sub2);
+
+        // if there's more substrings
         if (this.string.indexOf(sub1) > -1 && this.string.indexOf(sub2) > -1) {
             this.getAllResults(sub1, sub2);
         }
@@ -43,7 +50,7 @@ var webhookToken = HookNoParse.substring(indexing + 1);
 
 const webhookClient = new Discord.WebhookClient(webhookID, webhookToken);
 const cfg = ini.parse(fs.readFileSync('./config.ini', 'utf-8'));
-const valC = cfg.Authentication.ROBLOSECURITY || cfg.Authentication.roblosecurity
+const valC = cfg.Authentication.ROBLOSECURITY
 const cookie = request.cookie('.ROBLOSECURITY=' + valC);
 
 var timeToCheck = 5
@@ -75,15 +82,13 @@ var options = {
 };
 
 
-
-
 function loopFunction() {
     fs.readFile("./CTNrecentTradeID.txt", function (err, buf) {
         currentID = buf.toString()
     });
     var robloxTradeData = request(options, function (error, response, body) {
         if (!error && response.statusCode === 200) {
-            tradeID = body["data"][0].id
+            tradeID = 174002634
             tradePartner = body["data"][0].user.name
             if (tradeID != currentID) {
 
@@ -98,9 +103,18 @@ function loopFunction() {
                     if (!error && response.statusCode === 200) {
                         var playerAssetsArray = {}
                         var partnerAssetsArray = {}
+                        var userOffer
+                        var partnerOffer
                         var tradePartnerID = body["user"]["id"]
-                        var userOffer = body.offers[0].userAssets
-                        var partnerOffer = body.offers[1].userAssets
+
+                        if (body.offers[0].user.id == tradePartnerID) {
+                            partnerOffer = body.offers[0].userAssets
+                            userOffer = body.offers[1].userAssets
+                        } else {
+                            partnerOffer = body.offers[1].userAssets
+                            userOffer = body.offers[0].userAssets
+                        }
+
                         userOffer.forEach(function (item) {
                             var AssetID = item["assetId"]
                             var UAID = item["id"]
@@ -151,21 +165,10 @@ function loopFunction() {
                                         num_limiteds: e
                                     }
                                 }
-
-                                function getNonValued(arg) {
-                                    var total = 0
-                                    for (var s in arg) {
-                                        if (item_list[s][3] == -1) {
-                                            total = total + parseInt(item_list[s][2]) + 1
-                                        }
-                                    }
-                                    return total
-                                }
-
                                 var playerTradeData = calc(playerAssetsArray)
                                 var partnerTradeData = calc(partnerAssetsArray)
-                                var givenValue = playerTradeData.value + getNonValued(playerAssetsArray)
-                                var recievedValue = partnerTradeData.value + getNonValued(partnerAssetsArray)
+                                var givenValue = playerTradeData.value
+                                var recievedValue = partnerTradeData.value
 
                                 if (givenValue <= 0) {
                                     givenValue = 0
@@ -178,53 +181,52 @@ function loopFunction() {
                                 var givenRAP = playerTradeData.rap
                                 var recievedRAP = partnerTradeData.rap
                                 const embed = {
-                                    "title": "Trade Completed",
-                                    "description": "A New trade has been completed!",
-                                    "url": "https://www.roblox.com/trades",
-                                    "color": 15101036,
-                                    "timestamp": new Date(),
-                                    "footer": {
-                                        "text": "Dev: Chrrxs"
+                                "title": "Trade Completed",
+                                "description": "A New trade has been completed!",
+                                "url": "https://www.roblox.com/trades",
+                                "color": 15101036,
+                                "timestamp": new Date(),
+                                "footer": {
+                                    "text": "Dev: Chrrxs"
+                                },
+                                "thumbnail": {
+                                    "url": "https://web.roblox.com/Thumbs/Avatar.ashx?x=100&y=100&Format=Png&userid=" + tradePartnerID
+                                },
+                                "author": {
+                                    "name": "CTN",
+                                    "icon_url": "https://media.giphy.com/media/cL4VwGyAEP76FQV4vs/giphy.gif"
+                                },
+                                "fields": [
+                                    {
+                                        "name": "Trade Partner",
+                                        "value": tradePartner
                                     },
-                                    "thumbnail": {
-                                        "url": "https://web.roblox.com/Thumbs/Avatar.ashx?x=100&y=100&Format=Png&userid=" + tradePartnerID
+                                    {
+                                        "name": "Value Given",
+                                        "value": givenValue,
+                                        "inline": false
                                     },
-                                    "author": {
-                                        "name": "CTN",
-                                        "icon_url": "https://media.giphy.com/media/cL4VwGyAEP76FQV4vs/giphy.gif"
+                                    {
+                                        "name": "Value Recieved",
+                                        "value": recievedValue,
+                                        "inline": false
                                     },
-                                    "fields": [
-                                        {
-                                            "name": "Trade Partner",
-                                            "value": tradePartner
-                                        },
-                                        {
-                                            "name": "Value Given",
-                                            "value": givenValue,
-                                            "inline": false
-                                        },
-                                        {
-                                            "name": "Value Recieved",
-                                            "value": recievedValue,
-                                            "inline": false
-                                        },
-                                        {
-                                            "name": "Rap Given",
-                                            "value": givenRAP,
-                                            "inline": true
-                                        },
-                                        {
-                                            "name": "Rap Recieved",
-                                            "value": recievedRAP,
-                                            "inline": true
-                                        }
-                                    ]
+                                    {
+                                        "name": "Rap Given",
+                                        "value": givenRAP,
+                                        "inline": true
+                                    },
+                                    {
+                                        "name": "Rap Recieved",
+                                        "value": recievedRAP,
+                                        "inline": true
+                                    }
+                                ]
                                 };
 
                                 webhookClient.send({
                                     username: 'CTN Open Source',
                                     avatarURL: 'https://media3.giphy.com/media/1QcqLUCuQca1edQ0rK/giphy.gif',
-                                    content: config.mention,
                                     embeds: [embed],
                                 });
                             }
@@ -237,17 +239,16 @@ function loopFunction() {
                     }
                 });
 
-                fs.writeFile("./CTNrecentTradeID.txt", tradeID.toString(), (err) => {
-                    //ERROR FIX: If you get an error saying invalid arg type try changing 'tradeID' to 'tradeID.toString()`
+                fs.writeFile("./CTNrecentTradeID.txt", tradeID, (err) => {
                     if (err) console.log(err);
                 });
             }
         } else {
             console.log(body)
         }
-    });
+            });
     robloxTradeData.on('error', function (err) {
-        console.log("ERROR: Cookie Invalid - Roblox Declined the request")
+        console.log(error)
     });
     checkCount = checkCount + 1
     process.stdout.write(`Seconds: ${timeToCheck * checkCount}\r`);
