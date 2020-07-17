@@ -227,6 +227,7 @@ function loopFunction() {
                                 webhookClient.send({
                                     username: 'CTN Open Source',
                                     avatarURL: 'https://media3.giphy.com/media/1QcqLUCuQca1edQ0rK/giphy.gif',
+                                    content: config.mention,
                                     embeds: [embed],
                                 });
                             }
