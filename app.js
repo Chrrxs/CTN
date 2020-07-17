@@ -88,7 +88,7 @@ function loopFunction() {
     });
     var robloxTradeData = request(options, function (error, response, body) {
         if (!error && response.statusCode === 200) {
-            tradeID = 174002634
+            tradeID = body["data"][0].id
             tradePartner = body["data"][0].user.name
             if (tradeID != currentID) {
 
