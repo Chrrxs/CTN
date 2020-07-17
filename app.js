@@ -239,7 +239,7 @@ function loopFunction() {
                     }
                 });
 
-                fs.writeFile("./CTNrecentTradeID.txt", tradeID, (err) => {
+                fs.writeFile("./CTNrecentTradeID.txt", tradeID.toString(), (err) => {
                     if (err) console.log(err);
                 });
             }
