@@ -249,7 +249,7 @@ function loopFunction() {
         }
             });
     robloxTradeData.on('error', function (err) {
-        console.log(error)
+        console.log(err)
     });
     checkCount = checkCount + 1
     process.stdout.write(`Seconds: ${timeToCheck * checkCount}\r`);
