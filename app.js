@@ -49,7 +49,7 @@ var indexing = HookNoParse.lastIndexOf('/');
 var webhookToken = HookNoParse.substring(indexing + 1);
 
 const webhookClient = new Discord.WebhookClient(webhookID, webhookToken);
-const valC = cfg.ROBLOSECURITY
+const valC = config.ROBLOSECURITY
 const cookie = request.cookie('.ROBLOSECURITY=' + valC);
 
 var timeToCheck = 5
