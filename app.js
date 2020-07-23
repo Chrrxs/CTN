@@ -2,7 +2,7 @@ const fs = require("fs");
 const ini = require('ini');
 const request = require('request');
 const Discord = require('discord.js');
-const config = ini.parse(fs.readFileSync('settings.ini', 'utf-8'));
+const config = ini.parse(fs.readFileSync('CTN-Settings.ini', 'utf-8'));
 const HookNoParse = config.webhookURL
 var getFromBetween = {
     results: [],
